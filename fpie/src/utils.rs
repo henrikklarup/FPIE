@@ -12,7 +12,6 @@ fn remove_first(s: &str) -> Option<&str> {
 pub fn get_include_list(includefile_path: &str) -> Vec<String> {
     let mut includes: Vec<String> = Vec::new();
     if let Ok(lines) = read_lines(includefile_path) {
-        // Consumes the iterator, returns an (Optional) String
         for line in lines {
             if let Ok(ip) = line {
                 if !ip.starts_with("!") {
@@ -27,7 +26,6 @@ pub fn get_include_list(includefile_path: &str) -> Vec<String> {
 pub fn get_exclude_list(includefile_path: &str) -> Vec<String> {
     let mut excludes: Vec<String> = Vec::new();
     if let Ok(lines) = read_lines(includefile_path) {
-        // Consumes the iterator, returns an (Optional) String
         for line in lines {
             if let Ok(ip) = line {
                 if ip.starts_with("!") {
@@ -42,7 +40,11 @@ pub fn get_exclude_list(includefile_path: &str) -> Vec<String> {
 pub fn expand_globs_to_files(context_dir: &str, glob_list: Vec<String>) -> Vec<String> {
     let mut filelist: Vec<String> = Vec::new();
     for expand in glob_list {
-        for entry in glob(&format!("{}/{}", context_dir, expand)).expect("Failed to read glob pattern") {
+        let mut expand_single_asterix = expand;
+        if expand_single_asterix.ends_with("/*") {
+            expand_single_asterix = format!("{}*/*", expand_single_asterix);
+        }
+        for entry in glob(&format!("{}/{}", context_dir, expand_single_asterix)).expect("Failed to read glob pattern") {
             if let Ok(path) = entry {
                 if path.is_file() {
                     filelist.push(path.display().to_string());

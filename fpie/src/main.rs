@@ -72,13 +72,13 @@ mod tests {
     #[test]
     fn test_complex() {
         let expected = vec![
-            "file with spaces",
+            "includefile",
             "includedir/.letsinclude",
             "includedir/alsoincludethisfile",
             "includedir/innerincludedir/innerincludefile",
-            "includefile"
+            "file with spaces",
         ];
-        
+
         let actual = do_it(
             "../testfixtures/complex/includedir/.includefile_many",
             "../testfixtures/complex"
