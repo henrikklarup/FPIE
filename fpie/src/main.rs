@@ -56,16 +56,34 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_add() {
+    fn test_simple_include() {
         let expected = vec!["foo.txt"];
-        let actual = do_it("../testfixtures/simple/includefile", "../testfixtures/simple");
-        assert_eq!(actual, expected);
+        let actual = do_it("../testfixtures/simple/include.txt", "../testfixtures/simple");
+        assert_eq!(expected, actual);
     }
 
-    // #[test]
-    // fn test_bad_add() {
-    //     // This assert would fire and test will fail.
-    //     // Please note, that private functions can be tested too!
-    //     assert_eq!(bad_add(1, 2), 3);
-    // }
+    #[test]
+    fn test_simple_exclude() {
+        let expected = vec!["foo.txt"];
+        let actual = do_it("../testfixtures/simple/exclude.txt", "../testfixtures/simple");
+        assert_eq!(expected, actual);
+    }
+
+    #[test]
+    fn test_complex() {
+        let expected = vec![
+            "file with spaces",
+            "includedir/.letsinclude",
+            "includedir/alsoincludethisfile",
+            "includedir/innerincludedir/innerincludefile",
+            "includefile"
+        ];
+        
+        let actual = do_it(
+            "../testfixtures/complex/includedir/.includefile_many",
+            "../testfixtures/complex"
+        );
+
+        assert_eq!(expected, actual);
+    }
 }

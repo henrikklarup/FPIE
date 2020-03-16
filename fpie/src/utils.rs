@@ -43,9 +43,10 @@ pub fn expand_globs_to_files(context_dir: &str, glob_list: Vec<String>) -> Vec<S
     let mut filelist: Vec<String> = Vec::new();
     for expand in glob_list {
         for entry in glob(&format!("{}/{}", context_dir, expand)).expect("Failed to read glob pattern") {
-            match entry {
-                Ok(path) => filelist.push(path.display().to_string()),
-                Err(e) => println!("{:?}", e),
+            if let Ok(path) = entry {
+                if path.is_file() {
+                    filelist.push(path.display().to_string());
+                }
             }
         }
     }
@@ -54,11 +55,9 @@ pub fn expand_globs_to_files(context_dir: &str, glob_list: Vec<String>) -> Vec<S
 
 pub fn except(list_one: Vec<String>, list_two: Vec<String>) -> Vec<String> {
     let mut final_list: Vec<String> = Vec::new();
-    let mut finalexclude = list_two.iter();
     for include in list_one {
-        match finalexclude.find(|&x| x.to_string() == include.to_string()) {
-            Some(_) => assert!(true),
-            None => final_list.push(include)
+        if !list_two.contains(&include) {
+            final_list.push(include);
         }
     }
     return final_list;
@@ -75,20 +74,66 @@ where P: AsRef<Path>, {
 }
 
 
-// #[cfg(test)]
-// mod tests {
-//     // // Note this useful idiom: importing names from outer (for mod tests) scope.
-//     // use super::*;
+#[cfg(test)]
+mod tests {
+    // Note this useful idiom: importing names from outer (for mod tests) scope.
+    use super::*;
 
-//     #[test]
-//     fn test_add() {
-//         assert_eq!(add(1, 2), 3);
-//     }
+    #[test]
+    fn test_finds_all_includes() {
+        let expected = vec!("*");
+        let actual = get_include_list("../testfixtures/simple/exclude.txt");
+        assert_eq!(expected, actual);
+    }
 
-//     #[test]
-//     fn test_bad_add() {
-//         // This assert would fire and test will fail.
-//         // Please note, that private functions can be tested too!
-//         assert_eq!(bad_add(1, 2), 3);
-//     }
-// }
+    #[test]
+    fn test_finds_all_excludes() {
+        let expected = vec!("exclude*", "include.txt");
+        let actual = get_exclude_list("../testfixtures/simple/exclude.txt");
+        assert_eq!(expected, actual);
+    }
+
+    #[test]
+    fn test_asterix_gives_all_files() {
+        let expected = vec!(
+            "../testfixtures/simple/exclude-this.txt",
+            "../testfixtures/simple/exclude.txt",
+            "../testfixtures/simple/foo.txt",
+            "../testfixtures/simple/include.txt"
+        );
+        let actual = expand_globs_to_files("../testfixtures/simple", get_include_list("../testfixtures/simple/exclude.txt"));
+        assert_eq!(expected, actual);
+    }
+
+    #[test]
+    fn test_exclude_files() {
+        let expected = vec!(
+            "../testfixtures/simple/exclude-this.txt",
+            "../testfixtures/simple/exclude.txt",
+            "../testfixtures/simple/include.txt"
+        );
+        let actual = expand_globs_to_files("../testfixtures/simple", get_exclude_list("../testfixtures/simple/exclude.txt"));
+        assert_eq!(expected, actual);
+    }
+
+    #[test]
+    fn except_works() {
+        let exclude_these = vec!(
+            "../testfixtures/simple/exclude-this.txt".to_string(),
+            "../testfixtures/simple/exclude.txt".to_string(),
+            "../testfixtures/simple/include.txt".to_string()
+        );
+        let include_these = vec!(
+            "../testfixtures/simple/exclude-this.txt".to_string(),
+            "../testfixtures/simple/exclude.txt".to_string(),
+            "../testfixtures/simple/foo.txt".to_string(),
+            "../testfixtures/simple/include.txt".to_string()
+        );
+
+        let expected = vec!(
+            "../testfixtures/simple/foo.txt".to_string()
+        );
+        let actual = except(include_these, exclude_these);
+        assert_eq!(expected, actual);
+    }
+}
