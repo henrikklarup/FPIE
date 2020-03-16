@@ -64,8 +64,31 @@ pub fn except(list_one: Vec<String>, list_two: Vec<String>) -> Vec<String> {
     return final_list;
 }
 
+pub fn trim_context(list: Vec<String>, context_path: &str) -> Vec<String> {
+    return list.into_iter().map(|x| x.replace(context_path, "")).collect();
+}
+
 fn read_lines<P>(filename: P) -> io::Result<io::Lines<io::BufReader<File>>>
 where P: AsRef<Path>, {
     let file = File::open(filename)?;
     Ok(io::BufReader::new(file).lines())
 }
+
+
+// #[cfg(test)]
+// mod tests {
+//     // // Note this useful idiom: importing names from outer (for mod tests) scope.
+//     // use super::*;
+
+//     #[test]
+//     fn test_add() {
+//         assert_eq!(add(1, 2), 3);
+//     }
+
+//     #[test]
+//     fn test_bad_add() {
+//         // This assert would fire and test will fail.
+//         // Please note, that private functions can be tested too!
+//         assert_eq!(bad_add(1, 2), 3);
+//     }
+// }
