@@ -87,14 +87,14 @@ mod tests {
     #[test]
     fn test_simple_include() {
         let expected = vec!["foo.txt"];
-        let actual = do_it("../testfixtures/simple/include.txt", "../testfixtures/simple");
+        let actual = do_it("../testfixtures/simple/include.txt", "../testfixtures/simple/");
         assert_eq!(expected, actual);
     }
 
     #[test]
     fn test_simple_exclude() {
         let expected = vec!["foo.txt"];
-        let actual = do_it("../testfixtures/simple/exclude.txt", "../testfixtures/simple");
+        let actual = do_it("../testfixtures/simple/exclude.txt", "../testfixtures/simple/");
         assert_eq!(expected, actual);
     }
 
@@ -110,7 +110,7 @@ mod tests {
 
         let actual = do_it(
             "../testfixtures/complex/includedir/.includefile_many",
-            "../testfixtures/complex"
+            "../testfixtures/complex/"
         );
 
         assert_eq!(expected, actual);
