@@ -5,15 +5,15 @@ mod utils;
 
 fn main() {
 
-    let matches = App::new("myapp")
+    let matches = App::new("FPIE")
        .version("1.0")
-       .about("Does great things!")
-       .author("Kevin K.")
+       .about("File Packer with Include and Exclude")
+       .author("Henrik Klarup")
         .arg(Arg::with_name("includefile")
         .short("i")
         .long("includefile")
-        .value_name("FILE")
-        .help("Specify the include file")
+        .value_name("PATH")
+        .help("Specify the includefile path")
         .takes_value(true).required(true))
         .arg(Arg::with_name("context")
         .short("c")
