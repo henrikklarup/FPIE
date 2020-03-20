@@ -74,10 +74,11 @@ jobs:
           use-cross: true
           command: build
           args: --release --target=${{ matrix.target }} --manifest-path ./fpie/Cargo.toml
+      - run: dir ./fpie/target
       - uses: actions/upload-artifact@v1
         with:
           name: ${{ matrix.target }}
-          path: ./fpie/target/${{ matrix.target }}/release/fpie
+          path: ./fpie/target/${{ matrix.target }}/release/fpie.exe
   test:
     name: Test
     runs-on: ubuntu-latest
@@ -91,6 +92,7 @@ jobs:
   release:
     name: Release
     runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/master'
     needs: [ build-linux, build-osx, build-win, test ]
     steps:
       - uses: actions/download-artifact@v2-preview
