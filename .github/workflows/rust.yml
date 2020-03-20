@@ -91,6 +91,7 @@ jobs:
   release:
     name: Release
     runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/master'
     needs: [ build-linux, build-osx, build-win, test ]
     steps:
       - uses: actions/download-artifact@v2-preview
