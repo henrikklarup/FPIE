@@ -10,9 +10,9 @@ jobs:
       matrix:
         target:
           - x86_64-unknown-linux-gnu
-          - x86_64-unknown-linux-musl	
+          - x86_64-unknown-linux-musl
           # - i686-unknown-linux-gnu
-          # - i686-unknown-linux-musl	
+          # - i686-unknown-linux-musl
     steps:
       - uses: actions/checkout@v2
       - uses: actions-rs/toolchain@v1
@@ -25,53 +25,71 @@ jobs:
           use-cross: true
           command: build
           args: --release --target=${{ matrix.target }} --manifest-path ./fpie/Cargo.toml
-  build-osx:
-    name: Build osx
-    runs-on: macos-latest
-    strategy:
-      matrix:
-        target:
-          - x86_64-apple-darwin
-    steps:
-      - uses: actions/checkout@v2
-      - uses: actions-rs/toolchain@v1
+      - uses: actions/upload-artifact@v1
         with:
-          toolchain: stable
-          target: ${{ matrix.target }}
-          override: true
-      - uses: actions-rs/cargo@v1
-        with:
-          use-cross: true
-          command: build
-          args: --release --target=${{ matrix.target }} --manifest-path ./fpie/Cargo.toml
-  build-win:
-    name: Build win
-    runs-on: windows-latest
-    strategy:
-      matrix:
-        target:
-          # - i686-pc-windows-gnu
-          # - i686-pc-windows-msvc
-          # - x86_64-pc-windows-gnu
-          - x86_64-pc-windows-msvc
-    steps:
-      - uses: actions/checkout@v2
-      - uses: actions-rs/toolchain@v1
-        with:
-          toolchain: stable
-          target: ${{ matrix.target }}
-          override: true
-      - uses: actions-rs/cargo@v1
-        with:
-          use-cross: true
-          command: build
-          args: --release --target=${{ matrix.target }} --manifest-path ./fpie/Cargo.toml
-  test:
-    name: Test
+          name: ${{ matrix.target }}
+          path: ./fpie/target/${{ matrix.target }}/release/fpie
+  # build-osx:
+  #   name: Build osx
+  #   runs-on: macos-latest
+  #   strategy:
+  #     matrix:
+  #       target:
+  #         - x86_64-apple-darwin
+  #   steps:
+  #     - uses: actions/checkout@v2
+  #     - uses: actions-rs/toolchain@v1
+  #       with:
+  #         toolchain: stable
+  #         target: ${{ matrix.target }}
+  #         override: true
+  #     - uses: actions-rs/cargo@v1
+  #       with:
+  #         use-cross: true
+  #         command: build
+  #         args: --release --target=${{ matrix.target }} --manifest-path ./fpie/Cargo.toml
+  # build-win:
+  #   name: Build win
+  #   runs-on: windows-latest
+  #   strategy:
+  #     matrix:
+  #       target:
+  #         # - i686-pc-windows-gnu
+  #         # - i686-pc-windows-msvc
+  #         # - x86_64-pc-windows-gnu
+  #         - x86_64-pc-windows-msvc
+  #   steps:
+  #     - uses: actions/checkout@v2
+  #     - uses: actions-rs/toolchain@v1
+  #       with:
+  #         toolchain: stable
+  #         target: ${{ matrix.target }}
+  #         override: true
+  #     - uses: actions-rs/cargo@v1
+  #       with:
+  #         use-cross: true
+  #         command: build
+  #         args: --release --target=${{ matrix.target }} --manifest-path ./fpie/Cargo.toml
+  # test:
+  #   name: Test
+  #   runs-on: ubuntu-latest
+  #   env:
+  #     working-directory: ./fpie
+  #   steps:
+  #   - uses: actions/checkout@v2
+  #   - name: Run tests
+  #     run: cargo test --verbose --manifest-path ./fpie/Cargo.toml
+  
+  release:
+    name: Release
     runs-on: ubuntu-latest
-    env:
-      working-directory: ./fpie
+    needs: [ build-linux ]
     steps:
-    - uses: actions/checkout@v2
-    - name: Run tests
-      run: cargo test --verbose --manifest-path ./fpie/Cargo.toml
+      - uses: actions/download-artifact@v2-preview
+        with:
+          path: artifacts
+      - uses: ncipollo/release-action@v1
+        with:
+          artifacts: "./artifacts/*"
+          tag: "v1"
+          token: ${{ secrets.GITHUB_TOKEN }}
