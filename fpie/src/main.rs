@@ -4,6 +4,7 @@ use clap::{App, Arg};
 extern crate tar;
 use tar::Builder;
 use std::fs::File;
+use std::io::{self, Write};
 
 mod utils;
 
@@ -51,18 +52,28 @@ fn main() {
         return;
     }
 
-    let mut output_file = "output.tar";
-    let output_val = matches.value_of("output");
-    if let Some(output) = output_val {
-        output_file = output;
-    }
-
-    let file = File::create(output_file).unwrap();
-    let mut a = Builder::new(file);
+    let mut a = Builder::new(Vec::new());
 
     for itm in final_list {
         a.append_path_with_name(format!("{}{}", context_path_with_trailing_slash, itm), itm).unwrap();
     }
+    let tar_data = a.into_inner().unwrap();
+
+    let output_val = matches.value_of("output");
+    if Some("-") == output_val {
+        io::stdout().write_all(&tar_data).unwrap();
+        io::stdout().flush().unwrap();
+        return;
+    }
+
+    let mut output_file = "output.tar";
+    if let Some(output) = output_val {
+        output_file = output;
+    }
+
+    let mut file = File::create(output_file).unwrap();
+    file.write_all(&tar_data).unwrap();
+    file.flush().unwrap();
 }
 
 
