@@ -3,16 +3,24 @@ name: Rust
 on: [push]
 
 jobs:
-  build-linux:
-    name: Build linux
-    runs-on: ubuntu-latest
+  build:
+    runs-on: ${{ matrix.os }}
+    name: Build
     strategy:
       matrix:
-        target:
-          - x86_64-unknown-linux-gnu
-          - x86_64-unknown-linux-musl
-          # - i686-unknown-linux-gnu
-          # - i686-unknown-linux-musl
+        include:
+        - os: ubuntu-latest 
+          target: x86_64-unknown-linux-gnu
+          filename: fpie
+        - os: ubuntu-latest
+          target: x86_64-unknown-linux-musl
+          filename: fpie
+        - os: macos-latest
+          target: x86_64-apple-darwin
+          filename: fpie
+        - os: windows-latest
+          target: x86_64-pc-windows-msvc
+          filename: fpie.exe
     steps:
       - uses: actions/checkout@v2
       - uses: actions-rs/toolchain@v1
@@ -25,59 +33,19 @@ jobs:
           use-cross: true
           command: build
           args: --release --target=${{ matrix.target }} --manifest-path ./fpie/Cargo.toml
+
+      - name: Install p7zip
+        # 7Zip not available on MacOS, install p7zip via homebrew.
+        run: brew install p7zip
+        if: matrix.os == 'macos-latest'
+
+      - name: Create archives
+        run: 7z a ./${{ matrix.target }}.zip ./fpie/target/${{ matrix.target }}/release/${{ matrix.filename }}
+
       - uses: actions/upload-artifact@v1
         with:
-          name: ${{ matrix.target }}
-          path: ./fpie/target/${{ matrix.target }}/release/fpie
-  build-osx:
-    name: Build osx
-    runs-on: macos-latest
-    strategy:
-      matrix:
-        target:
-          - x86_64-apple-darwin
-    steps:
-      - uses: actions/checkout@v2
-      - uses: actions-rs/toolchain@v1
-        with:
-          toolchain: stable
-          target: ${{ matrix.target }}
-          override: true
-      - uses: actions-rs/cargo@v1
-        with:
-          use-cross: true
-          command: build
-          args: --release --target=${{ matrix.target }} --manifest-path ./fpie/Cargo.toml
-      - uses: actions/upload-artifact@v1
-        with:
-          name: ${{ matrix.target }}
-          path: ./fpie/target/${{ matrix.target }}/release/fpie
-  build-win:
-    name: Build win
-    runs-on: windows-latest
-    strategy:
-      matrix:
-        target:
-          # - i686-pc-windows-gnu
-          # - i686-pc-windows-msvc
-          # - x86_64-pc-windows-gnu
-          - x86_64-pc-windows-msvc
-    steps:
-      - uses: actions/checkout@v2
-      - uses: actions-rs/toolchain@v1
-        with:
-          toolchain: stable
-          target: ${{ matrix.target }}
-          override: true
-      - uses: actions-rs/cargo@v1
-        with:
-          use-cross: true
-          command: build
-          args: --release --target=${{ matrix.target }} --manifest-path ./fpie/Cargo.toml
-      - uses: actions/upload-artifact@v1
-        with:
-          name: ${{ matrix.target }}
-          path: ./fpie/target/${{ matrix.target }}/release/fpie.exe
+          name: ${{ matrix.target }}.zip
+          path: ./${{ matrix.target}}.zip
   test:
     name: Test
     runs-on: ubuntu-latest
@@ -92,13 +60,13 @@ jobs:
     name: Release
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/master'
-    needs: [ build-linux, build-osx, build-win, test ]
+    needs: [ build, test ]
     steps:
       - uses: actions/download-artifact@v2-preview
         with:
           path: artifacts
       - uses: ncipollo/release-action@v1
         with:
-          artifacts: "./artifacts/*"
+          artifacts: "./artifacts/**/*.zip"
           tag: "v1"
           token: ${{ secrets.GITHUB_TOKEN }}
