@@ -65,8 +65,10 @@ jobs:
       - uses: actions/download-artifact@v2-preview
         with:
           path: artifacts
-      - uses: ncipollo/release-action@v1
+
+      - uses: "marvinpinto/action-automatic-releases@latest"
         with:
-          artifacts: "./artifacts/**/*.zip"
-          tag: "v1"
-          token: ${{ secrets.GITHUB_TOKEN }}
+          repo_token: "${{ secrets.GITHUB_TOKEN }}"
+          prerelease: false
+          files: |
+            ./artifacts/**/*.zip
