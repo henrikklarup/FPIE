@@ -63,17 +63,16 @@ jobs:
     needs: [ build, test ]
     steps:
       - name: Bump version and push tag
+        id: version_bump
         uses: mathieudutour/github-tag-action@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
       - uses: actions/download-artifact@v2-preview
         with:
           path: artifacts
-
       - uses: "marvinpinto/action-automatic-releases@latest"
         with:
           repo_token: "${{ secrets.GITHUB_TOKEN }}"
           prerelease: false
-          automatic_release_tag: latest
           files: |
             ./artifacts/**/*.zip
