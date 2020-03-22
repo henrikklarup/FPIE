@@ -62,6 +62,7 @@ jobs:
     if: github.ref == 'refs/heads/master'
     needs: [ build, test ]
     steps:
+      - uses: actions/checkout@v2
       - name: Bump version and push tag
         id: version_bump
         uses: mathieudutour/github-tag-action@v4
