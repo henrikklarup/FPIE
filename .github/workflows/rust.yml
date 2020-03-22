@@ -75,6 +75,6 @@ jobs:
         with:
           repo_token: "${{ secrets.GITHUB_TOKEN }}"
           prerelease: false
-          automatic_release_tag: "${{ steps.version_bump.outputs.new_version }}"
+          automatic_release_tag: "${{ format('v{0}', steps.version_bump.outputs.new_version) }}"
           files: |
             ./artifacts/**/*.zip
