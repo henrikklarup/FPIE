@@ -62,6 +62,10 @@ jobs:
     if: github.ref == 'refs/heads/master'
     needs: [ build, test ]
     steps:
+      - name: Bump version and push tag
+        uses: mathieudutour/github-tag-action@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
       - uses: actions/download-artifact@v2-preview
         with:
           path: artifacts

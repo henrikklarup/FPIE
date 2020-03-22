@@ -8,10 +8,13 @@ use std::io::{self, Write};
 
 mod utils;
 
-fn main() {
+extern crate git_version;
+use git_version::git_version;
 
+fn main() {
+    const GIT_VERSION: &str = git_version!(args = ["--tags"], fallback = "unknown");
     let matches = App::new("FPIE")
-       .version("1.0")
+       .version(GIT_VERSION)
        .about("File Packer with Include and Exclude")
        .author("Henrik Klarup")
         .arg(Arg::with_name("includefile")
