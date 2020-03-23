@@ -8,13 +8,14 @@ use std::io::{self, Write};
 
 mod utils;
 
-extern crate git_version;
-use git_version::git_version;
+// extern crate git_version;
+// use git_version::git_version;
 
 fn main() {
-    const GIT_VERSION: &str = git_version!(args = ["--tags"], fallback = "unknown");
+    let fpie_version: &'static str = option_env!("VERSION").unwrap_or("local");
+    // const fpie_version: &str = git_version!(args = ["--tags"], fallback = "unknown");
     let matches = App::new("FPIE")
-       .version(GIT_VERSION)
+       .version(fpie_version)
        .about("File Packer with Include and Exclude")
        .author("Henrik Klarup")
         .arg(Arg::with_name("includefile")
