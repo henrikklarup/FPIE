@@ -18,7 +18,6 @@ jobs:
         with:
           name: version
           path: ./version
-
   build:
     runs-on: ${{ matrix.os }}
     needs: [ init ]
@@ -49,30 +48,23 @@ jobs:
         with:
           name: version
           path: ./version
-      - uses: GenesisSam/get-simple-file-action@v1.0.4
-        id: openFile
+      - id: openFile
+        uses: juliangruber/read-file-action@v1
         with:
-          file-name: ./version/version
+          path: ./version/version
+      - name: result
+        run: echo "${{ steps.openFile.outputs.content }}"
       - uses: actions-rs/cargo@v1
         env:
-          VERSION: ${{ steps.openFile.outputs.data }}
+          VERSION: "${{ format('v{0}', steps.openFile.outputs.content) }}"
         with:
           use-cross: true
           command: build
           args: --release --target=${{ matrix.target }} --manifest-path ./fpie/Cargo.toml
-
-      - name: Install p7zip
-        # 7Zip not available on MacOS, install p7zip via homebrew.
-        run: brew install p7zip
-        if: matrix.os == 'macos-latest'
-
-      - name: Create archives
-        run: 7z a ./${{ matrix.target }}.zip ./fpie/target/${{ matrix.target }}/release/${{ matrix.filename }}
-
       - uses: actions/upload-artifact@v1
         with:
-          name: ${{ matrix.target }}.zip
-          path: ./${{ matrix.target}}.zip
+          name: ${{ matrix.target }}
+          path: ./fpie/target/${{ matrix.target }}/release/${{ matrix.filename }}
   test:
     name: Test
     runs-on: ubuntu-latest
@@ -98,10 +90,14 @@ jobs:
       - uses: actions/download-artifact@v2-preview
         with:
           path: artifacts
+      - id: openFile
+        uses: juliangruber/read-file-action@v1
+        with:
+          path: ./version/version
       - uses: "marvinpinto/action-automatic-releases@latest"
         with:
           repo_token: "${{ secrets.GITHUB_TOKEN }}"
           prerelease: false
-          automatic_release_tag: "${{ format('v{0}', steps.version_bump.outputs.new_version) }}"
+          automatic_release_tag: "${{ format('v{0}', steps.openFile.outputs.content) }}"
           files: |
             ./artifacts/**/*.zip
