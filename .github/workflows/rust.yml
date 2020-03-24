@@ -95,7 +95,7 @@ jobs:
         with:
           path: ./artifacts/version/version
       - run: rm -rf ./artifacts/version
-      - run: for i in ./artifacts/*/; do zip -r "${i%/}.zip" "$i"; done
+      - run: for i in ./artifacts/*/; do zip -j -r "${i%/}.zip" "$i"; done
       - uses: "marvinpinto/action-automatic-releases@latest"
         with:
           repo_token: "${{ secrets.GITHUB_TOKEN }}"
