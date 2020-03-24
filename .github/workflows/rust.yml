@@ -94,10 +94,12 @@ jobs:
         uses: juliangruber/read-file-action@v1
         with:
           path: ./artifacts/version/version
+      - run: rm -rf ./artifacts/version
+      - run: for i in ./artifacts/*/; do zip -r "${i%/}.zip" "$i"; done
       - uses: "marvinpinto/action-automatic-releases@latest"
         with:
           repo_token: "${{ secrets.GITHUB_TOKEN }}"
           prerelease: false
           automatic_release_tag: "${{ format('v{0}', steps.openFile.outputs.content) }}"
           files: |
-            ./artifacts/**/*.zip
+            ./**/*.zip
