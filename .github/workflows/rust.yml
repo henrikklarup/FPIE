@@ -93,7 +93,7 @@ jobs:
       - id: openFile
         uses: juliangruber/read-file-action@v1
         with:
-          path: ./version/version
+          path: ./artifacts/version/version
       - uses: "marvinpinto/action-automatic-releases@latest"
         with:
           repo_token: "${{ secrets.GITHUB_TOKEN }}"
