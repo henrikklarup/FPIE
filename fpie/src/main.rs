@@ -22,18 +22,21 @@ fn main() {
         .short("i")
         .long("includefile")
         .value_name("PATH")
+        .default_value("includefile")
         .help("Specify the includefile path")
         .takes_value(true).required(true))
         .arg(Arg::with_name("context")
         .short("c")
         .long("context")
         .value_name("PATH")
+        .default_value(".")
         .help("Specify the context path")
         .takes_value(true).required(true))
         .arg(Arg::with_name("output")
         .short("o")
         .long("output")
         .value_name("PATH")
+        .default_value("-")
         .help("Specify output file path")
         .takes_value(true))
         .arg(Arg::with_name("dry-run")
@@ -69,7 +72,7 @@ fn main() {
     if let Some(output) = output_val {
         output_file = output;
     }
-    if Some("-") == output_file {
+    if "-" == output_file {
         io::stdout().write_all(&tar_data).unwrap();
         io::stdout().flush().unwrap();
         return;
