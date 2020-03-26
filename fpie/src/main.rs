@@ -65,15 +65,14 @@ fn main() {
     let tar_data = a.into_inner().unwrap();
 
     let output_val = matches.value_of("output");
-    if Some("-") == output_val {
+    let mut output_file = "-";
+    if let Some(output) = output_val {
+        output_file = output;
+    }
+    if Some("-") == output_file {
         io::stdout().write_all(&tar_data).unwrap();
         io::stdout().flush().unwrap();
         return;
-    }
-
-    let mut output_file = "output.tar";
-    if let Some(output) = output_val {
-        output_file = output;
     }
 
     let mut file = File::create(output_file).unwrap();
