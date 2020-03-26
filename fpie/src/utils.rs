@@ -79,14 +79,25 @@ mod tests {
     #[test]
     fn test_finds_all_includes() {
         let expected = vec!("*");
-        let actual = get_include_list(lines_from_file("../testfixtures/simple/exclude.txt"));
+        let actual = get_include_list(
+            vec!(
+                "*".to_string(),
+                "!exclude.txt".to_string()
+            )
+        );
         assert_eq!(expected, actual);
     }
 
     #[test]
     fn test_finds_all_excludes() {
         let expected = vec!("exclude*", "include.txt");
-        let actual = get_exclude_list(lines_from_file("../testfixtures/simple/exclude.txt"));
+        let actual = get_exclude_list(
+            vec!(
+                "!exclude*".to_string(),
+                "!include.txt".to_string(),
+                "included".to_string()
+            )
+        );
         assert_eq!(expected, actual);
     }
 
@@ -98,7 +109,9 @@ mod tests {
             "../testfixtures/simple/foo.txt",
             "../testfixtures/simple/include.txt"
         );
-        let actual = expand_globs_to_files("../testfixtures/simple", get_include_list(lines_from_file("../testfixtures/simple/exclude.txt")));
+        let actual = expand_globs_to_files(
+            "../testfixtures/simple",
+            get_include_list(vec!("*".to_string())));
         assert_eq!(expected, actual);
     }
 
@@ -109,7 +122,15 @@ mod tests {
             "../testfixtures/simple/exclude.txt",
             "../testfixtures/simple/include.txt"
         );
-        let actual = expand_globs_to_files("../testfixtures/simple", get_exclude_list(lines_from_file("../testfixtures/simple/exclude.txt")));
+        let actual = expand_globs_to_files(
+            "../testfixtures/simple",
+            get_exclude_list(
+                vec!(
+                    "!exclude*".to_string(),
+                    "!include.txt".to_string()
+                )
+            )
+        );
         assert_eq!(expected, actual);
     }
 
