@@ -38,6 +38,7 @@ fn main() {
         .takes_value(true))
         .arg(Arg::with_name("dry-run")
         .short("d")
+        .long("dry-run")
         .help("Print a list of files to be packed"))
        .get_matches();
 
