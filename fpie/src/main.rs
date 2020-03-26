@@ -8,12 +8,8 @@ use std::io::{self, Write};
 
 mod utils;
 
-// extern crate git_version;
-// use git_version::git_version;
-
 fn main() {
     let fpie_version: &'static str = option_env!("VERSION").unwrap_or("local");
-    // const fpie_version: &str = git_version!(args = ["--tags"], fallback = "unknown");
     let matches = App::new("FPIE")
        .version(fpie_version)
        .about("File Packer with Include and Exclude")
@@ -85,8 +81,9 @@ fn main() {
 
 
 pub fn do_it(includefile_path: &str, context_path: &str) -> Vec<String> {
-    let includes = utils::get_include_list(includefile_path);
-    let excludes = utils::get_exclude_list(includefile_path);
+    let lines = utils::lines_from_file(includefile_path);
+    let includes = utils::get_include_list(lines.clone());
+    let excludes = utils::get_exclude_list(lines);
     let includedfiles = utils::expand_globs_to_files(context_path, includes);
     let excludedfiles = utils::expand_globs_to_files(context_path, excludes);
 

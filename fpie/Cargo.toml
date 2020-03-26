@@ -7,4 +7,3 @@ authors = ["hklsiteimprove"]
 glob = "0.3.0"
 clap = "2.33.0"
 tar = "0.4"
-# git-version = "0.3.4"
