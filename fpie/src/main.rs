@@ -48,7 +48,7 @@ fn main() {
         context_path_with_trailing_slash.push_str("/");
     }
     let dry_run = matches.is_present("dry-run");
-    let final_list = do_it(inc, &context_path_with_trailing_slash);
+    let final_list = caculate_filelist(inc, &context_path_with_trailing_slash);
     if dry_run {
         for itm in final_list {
             println!("{}", itm);
@@ -80,7 +80,7 @@ fn main() {
 }
 
 
-pub fn do_it(includefile_path: &str, context_path: &str) -> Vec<String> {
+pub fn caculate_filelist(includefile_path: &str, context_path: &str) -> Vec<String> {
     let lines = utils::lines_from_file(includefile_path);
     let includes = utils::get_include_list(lines.clone());
     let excludes = utils::get_exclude_list(lines);
@@ -102,14 +102,14 @@ mod tests {
     #[test]
     fn test_simple_include() {
         let expected = vec!["foo.txt"];
-        let actual = do_it("../testfixtures/simple/include.txt", "../testfixtures/simple/");
+        let actual = caculate_filelist("../testfixtures/simple/include.txt", "../testfixtures/simple/");
         assert_eq!(expected, actual);
     }
 
     #[test]
     fn test_simple_exclude() {
         let expected = vec!["foo.txt"];
-        let actual = do_it("../testfixtures/simple/exclude.txt", "../testfixtures/simple/");
+        let actual = caculate_filelist("../testfixtures/simple/exclude.txt", "../testfixtures/simple/");
         assert_eq!(expected, actual);
     }
 
@@ -123,7 +123,7 @@ mod tests {
             "file with spaces",
         ];
 
-        let actual = do_it(
+        let actual = caculate_filelist(
             "../testfixtures/complex/includedir/.includefile_many",
             "../testfixtures/complex/"
         );
