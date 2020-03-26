@@ -6,6 +6,10 @@ FPIE can help you create tar files from the specified includefile.
 Download the binaries which fits your platform from [Latest release](https://github.com/hklsiteimprove/FPIE/releases/latest).
 
 ## Usage
+
+### Includefile syntax
+See [Includefile syntax readme](Docs/SYNTAX.md)
+
 ### Small context size for docker
 The FPIE project is mainly for use together with docker, for building small docker contexts to send into the docker build:
 

@@ -96,7 +96,6 @@ pub fn caculate_filelist(includefile_path: &str, context_path: &str) -> Vec<Stri
 
 #[cfg(test)]
 mod tests {
-    // // Note this useful idiom: importing names from outer (for mod tests) scope.
     use super::*;
 
     #[test]
@@ -116,11 +115,11 @@ mod tests {
     #[test]
     fn test_complex() {
         let expected = vec![
-            "includefile",
+            "file with spaces",
             "includedir/.letsinclude",
             "includedir/alsoincludethisfile",
             "includedir/innerincludedir/innerincludefile",
-            "file with spaces",
+            "includefile",
         ];
 
         let actual = caculate_filelist(
