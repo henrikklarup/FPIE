@@ -37,28 +37,17 @@ pub fn expand_globs_to_files(context_dir: &str, glob_list: Vec<String>) -> Vec<S
     let mut filelist: HashMap<String, String> = HashMap::new();
     for expand in glob_list {
         let mut expand_single_asterix = expand;
+        if expand_single_asterix.ends_with("/") {
+            expand_single_asterix.push_str("*");
+        }
+        if expand_single_asterix.ends_with("/*") {
+            expand_single_asterix = format!("{}*/*", expand_single_asterix);
+        }
+
         for entry in glob(&format!("{}/{}", context_dir, expand_single_asterix)).expect("Failed to read glob pattern") {
             if let Ok(path) = entry {
                 if path.is_file() {
                     filelist.insert(path.display().to_string(),path.display().to_string());
-                }
-                if path.is_dir() {
-                    if !expand_single_asterix.ends_with("/") {
-                        expand_single_asterix.push_str("/");
-                    }
-                    if expand_single_asterix.ends_with("/") {
-                        expand_single_asterix.push_str("*");
-                    }
-                    if expand_single_asterix.ends_with("/*") {
-                        expand_single_asterix = format!("{}*/*", expand_single_asterix);
-                    }
-                    for entry in glob(&format!("{}/{}", context_dir, expand_single_asterix)).expect("Failed to read glob pattern") {
-                        if let Ok(path) = entry {
-                            if path.is_file() {
-                                filelist.insert(path.display().to_string(),path.display().to_string());
-                            }
-                        }
-                    }
                 }
             }
         }
