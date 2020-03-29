@@ -91,7 +91,7 @@ jobs:
         with:
           path: artifacts
       - name: Remove newline from version
-        run: tr -d '\n' < ./artifacts/version/version
+        run: tr -d '\n' < ./artifacts/version/version > ./artifacts/version/version
       - id: openFile
         uses: juliangruber/read-file-action@v1
         with:
