@@ -103,3 +103,9 @@ jobs:
           automatic_release_tag: "${{ format('v{0}', steps.openFile.outputs.content) }}"
           files: |
             ./**/*.zip
+      - uses: docker/build-push-action@v1
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+          repository: hklsiteimprove/fpie
+          tags: latest,"${{ format('v{0}', steps.openFile.outputs.content) }}"
