@@ -99,12 +99,12 @@ jobs:
           path: ./artifacts/version/version
       - run: rm -rf ./artifacts/version
       - run: for i in ./artifacts/*/; do zip -j -r "${i%/}.zip" "$i"; done
-      # - uses: docker/build-push-action@v1
-      #   with:
-      #     username: ${{ secrets.DOCKER_USERNAME }}
-      #     password: ${{ secrets.DOCKER_PASSWORD }}
-      #     repository: hklsiteimprove/fpie
-      #     tags: "${{ format('latest,v{0}', steps.openFile.outputs.content) }}"
+      - uses: docker/build-push-action@v1
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+          repository: hklsiteimprove/fpie
+          tags: "${{ format('latest,v{0}', steps.openFile.outputs.content) }}"
       - uses: "marvinpinto/action-automatic-releases@latest"
         with:
           repo_token: "${{ secrets.GITHUB_TOKEN }}"
