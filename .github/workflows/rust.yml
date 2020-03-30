@@ -90,24 +90,24 @@ jobs:
       - uses: actions/download-artifact@v2-preview
         with:
           path: artifacts
-      - name: Remove newline from version
-        run: tr -d '\n' < ./artifacts/version/version > ./artifacts/version/version
+      # - name: Remove newline from version
+      #   run: tr -d '\n' < ./artifacts/version/version > ./artifacts/version/version
       - id: openFile
         uses: juliangruber/read-file-action@v1
         with:
           path: ./artifacts/version/version
       - run: rm -rf ./artifacts/version
       - run: for i in ./artifacts/*/; do zip -j -r "${i%/}.zip" "$i"; done
-      - uses: "marvinpinto/action-automatic-releases@latest"
-        with:
-          repo_token: "${{ secrets.GITHUB_TOKEN }}"
-          prerelease: false
-          automatic_release_tag: "${{ format('v{0}', steps.openFile.outputs.content) }}"
-          files: |
-            ./**/*.zip
       - uses: docker/build-push-action@v1
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
           repository: hklsiteimprove/fpie
-          tags: latest,"${{ format('v{0}', steps.openFile.outputs.content) }}"
+          tags: "${{ format('v{0}', steps.openFile.outputs.content) }}"
+      - uses: "marvinpinto/action-automatic-releases@latest"
+        with:
+          repo_token: "${{ secrets.GITHUB_TOKEN }}"
+          prerelease: false
+          automatic_release_tag: latest,${{ format('v{0}', steps.openFile.outputs.content) }}
+          files: |
+            ./**/*.zip
