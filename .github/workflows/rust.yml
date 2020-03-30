@@ -108,6 +108,6 @@ jobs:
         with:
           repo_token: "${{ secrets.GITHUB_TOKEN }}"
           prerelease: false
-          automatic_release_tag: latest,${{ format('v{0}', steps.openFile.outputs.content) }}
+          automatic_release_tag: "${{ format('latest,v{0}', steps.openFile.outputs.content) }}"
           files: |
             ./**/*.zip
