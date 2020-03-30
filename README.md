@@ -17,6 +17,11 @@ The FPIE project is mainly for use together with docker, for building small dock
     fpie -c . -i includefile -o - | docker build -f ./dockerfile -
 ```
 
+You can also use docker instead of the binary:
+```bash
+    docker run -v <contextdir>:/data hklsiteimprove/fpie -c data -i data/includefile | docker build -f ./dockerfile -
+```
+
 ## Testing 
 Tests are automatically run as part of the CI pipeline, and reported back to any pull-request.
 To manually run tests go to the `fpie` folder and run:
