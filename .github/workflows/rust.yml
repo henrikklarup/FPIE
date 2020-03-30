@@ -103,11 +103,11 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
           repository: hklsiteimprove/fpie
-          tags: "${{ format('v{0}', steps.openFile.outputs.content) }}"
+          tags: "${{ format('latest,v{0}', steps.openFile.outputs.content) }}"
       - uses: "marvinpinto/action-automatic-releases@latest"
         with:
           repo_token: "${{ secrets.GITHUB_TOKEN }}"
           prerelease: false
-          automatic_release_tag: "${{ format('latest,v{0}', steps.openFile.outputs.content) }}"
+          automatic_release_tag: "${{ format('v{0}', steps.openFile.outputs.content) }}"
           files: |
             ./**/*.zip
