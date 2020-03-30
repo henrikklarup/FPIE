@@ -1,4 +1,3 @@
-FROM alpine:3.10
+FROM scratch
 COPY ./artifacts/x86_64-unknown-linux-musl/fpie /fpie
-RUN chmod +x /fpie
 ENTRYPOINT ["/fpie"]
