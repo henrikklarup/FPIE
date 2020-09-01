@@ -3,13 +3,113 @@ name: Rust
 on: [push]
 
 jobs:
-  build:
-
+  init:
+    name: Initialize
     runs-on: ubuntu-latest
-
+    steps:
+      - uses: actions/checkout@v2
+      - name: Bump version and push tag
+        id: version_bump
+        uses: mathieudutour/github-tag-action@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          dry_run: true
+      - run: echo ${{ steps.version_bump.outputs.new_version }} > ./version
+      - uses: actions/upload-artifact@v1
+        with:
+          name: version
+          path: ./version
+  build:
+    runs-on: ${{ matrix.os }}
+    needs: [ init ]
+    name: Build
+    strategy:
+      matrix:
+        include:
+        - os: ubuntu-latest 
+          target: x86_64-unknown-linux-gnu
+          filename: fpie
+        - os: ubuntu-latest
+          target: x86_64-unknown-linux-musl
+          filename: fpie
+        - os: macos-latest
+          target: x86_64-apple-darwin
+          filename: fpie
+        - os: windows-latest
+          target: x86_64-pc-windows-msvc
+          filename: fpie.exe
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          target: ${{ matrix.target }}
+          override: true
+      - uses: actions/download-artifact@v2-preview
+        with:
+          name: version
+          path: ./version
+      - id: openFile
+        uses: juliangruber/read-file-action@v1
+        with:
+          path: ./version/version
+      - name: result
+        run: echo "${{ steps.openFile.outputs.content }}"
+      - uses: actions-rs/cargo@v1
+        env:
+          VERSION: "${{ format('v{0}', steps.openFile.outputs.content) }}"
+        with:
+          use-cross: true
+          command: build
+          args: --release --target=${{ matrix.target }} --manifest-path ./fpie/Cargo.toml
+      - uses: actions/upload-artifact@v1
+        with:
+          name: ${{ matrix.target }}
+          path: ./fpie/target/${{ matrix.target }}/release/${{ matrix.filename }}
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    env:
+      working-directory: ./fpie
     steps:
     - uses: actions/checkout@v2
-    - name: Build
-      run: cd fpie && cargo build --verbose
     - name: Run tests
-      run: cd fpie && cargo test --verbose
+      run: cargo test --verbose --manifest-path ./fpie/Cargo.toml
+  
+  release:
+    name: Release
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/master'
+    needs: [ build, test ]
+    steps:
+      - uses: actions/checkout@v2
+      - name: Bump version and push tag
+        id: version_bump
+        uses: mathieudutour/github-tag-action@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+      - uses: actions/download-artifact@v2-preview
+        with:
+          path: artifacts
+      # - name: Remove newline from version
+      #   run: tr -d '\n' < ./artifacts/version/version > ./artifacts/version/version
+      - id: openFile
+        uses: juliangruber/read-file-action@v1
+        with:
+          path: ./artifacts/version/version
+      - run: rm -rf ./artifacts/version
+      - run: for i in ./artifacts/*/; do zip -j -r "${i%/}.zip" "$i"; done
+      - run: chmod +x ./artifacts/x86_64-unknown-linux-musl/fpie
+      - uses: docker/build-push-action@v1
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+          repository: hklsiteimprove/fpie
+          tags: "${{ format('latest,v{0}', steps.openFile.outputs.content) }}"
+      - uses: "marvinpinto/action-automatic-releases@latest"
+        with:
+          repo_token: "${{ secrets.GITHUB_TOKEN }}"
+          prerelease: false
+          automatic_release_tag: "${{ format('v{0}', steps.openFile.outputs.content) }}"
+          files: |
+            ./**/*.zip

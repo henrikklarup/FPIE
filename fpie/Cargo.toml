@@ -1,8 +1,9 @@
 [package]
 name = "fpie"
 version = "0.1.0"
-authors = ["kristinenissen"]
+authors = ["hklsiteimprove"]
 
 [dependencies]
 glob = "0.3.0"
 clap = "2.33.0"
+tar = "0.4"
