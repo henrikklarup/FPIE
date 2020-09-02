@@ -51,7 +51,7 @@ fi
 
 URL="${BASE}/${VERSION}/${FILENAME}"
 if [ -z "${DRYRUN}" ]; then
-  curl -fL "${URL}" -o "${TO}/fpie.zip" && unzip "${TO}/fpie.zip" -d "${TO}" && rm -f "${TO}/fpie.zip" && chmod +x "${TO}/fpie"
+  curl -fL "${URL}" -o "${TO}/fpie.zip" && unzip -o "${TO}/fpie.zip" -d "${TO}" && rm -f "${TO}/fpie.zip" && chmod +x "${TO}/fpie"
 else
   echo "Would download ${FILENAME} for ${MACHINE} from ${URL} to ${TO}"
 fi
