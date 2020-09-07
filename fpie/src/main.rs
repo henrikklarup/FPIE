@@ -129,4 +129,22 @@ mod tests {
 
         assert_eq!(expected, actual);
     }
+
+    #[test]
+    fn test_large() {
+        // let expected = vec![
+        //     "file with spaces",
+        //     "includedir/.letsinclude",
+        //     "includedir/alsoincludethisfile",
+        //     "includedir/innerincludedir/innerincludefile",
+        //     "includefile",
+        // ];
+
+        let actual = caculate_filelist(
+            "../testfixtures/verybig/.includefile",
+            "../testfixtures/verybig/"
+        );
+
+        assert_eq!(5003, actual.len());
+    }
 }
